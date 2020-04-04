@@ -7,7 +7,9 @@
           v-for="item in menuTab"
           @click="toggleMenu(item)"
           :key="item.id"
-        >{{ item.txt }}</li>
+        >
+          {{ item.txt }}
+        </li>
       </ul>
       <el-form
         :model="ruleForm"
@@ -19,7 +21,11 @@
       >
         <el-form-item prop="username" class="item-from">
           <label for>邮箱</label>
-          <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
+          <el-input
+            type="text"
+            v-model="ruleForm.username"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="password" class="item-from">
           <label for>密码</label>
@@ -31,7 +37,11 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item v-show="model == 'register'" prop="passwords" class="item-from">
+        <el-form-item
+          v-show="model == 'register'"
+          prop="passwords"
+          class="item-from"
+        >
           <label for>重复密码</label>
           <el-input
             minlength="6"
@@ -45,15 +55,24 @@
           <label for>验证码</label>
           <el-row :gutter="10">
             <el-col :span="15">
-              <el-input minlength="6" maxlength="6" v-model.number="ruleForm.code"></el-input>
+              <el-input
+                minlength="6"
+                maxlength="6"
+                v-model.number="ruleForm.code"
+              ></el-input>
             </el-col>
             <el-col :span="9">
-              <el-button class="block" @click="getSms" type="success">获取验证码</el-button>
+              <el-button class="block" type="success">获取验证码</el-button>
             </el-col>
           </el-row>
         </el-form-item>
         <el-form-item>
-          <el-button class="login-btn block" type="danger" @click="submitForm('ruleForm')">提交</el-button>
+          <el-button
+            class="login-btn block"
+            type="danger"
+            @click="submitForm('ruleForm')"
+            >提交</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -61,8 +80,6 @@
 </template>
 
 <script>
-import { GetSms, GetSms2 } from "@/api/login.js";
-import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 import {
   stripscript,
   validateEmail,
@@ -71,22 +88,7 @@ import {
 } from "@/utils/validate.js";
 export default {
   name: "login",
-  setup(props, content) {
-    const menuTab = reactive([
-      { txt: "登录", current: true, type: "login" },
-      { txt: "注册", current: false, type: "register" }
-    ]);
-
-    const model = ref("login");
-
-    // 表单的数据
-    const ruleForm = reactive({
-      username: "",
-      password: "",
-      passwords: "",
-      code: ""
-    });
-
+  data() {
     // 验证用户名
     let validateUsername = (rule, value, callback) => {
       if (value === "") {
@@ -100,8 +102,8 @@ export default {
 
     // 验证密码
     let validatePassword = (rule, value, callback) => {
-      ruleForm.password = stripscript(value);
-      value = ruleForm.password;
+      this.ruleForm.password = stripscript(value);
+      value = this.ruleForm.password;
       if (value === "") {
         callback(new Error("请输入密码"));
       } else if (validatePass(value)) {
@@ -113,12 +115,12 @@ export default {
 
     // 验证重复密码
     let validatePasswords = (rule, value, callback) => {
-      if (model.value == "login") {
+      if (this.model == "login") {
         callback();
       }
 
-      ruleForm.passwords = stripscript(value);
-      value = ruleForm.passwords;
+      this.ruleForm.passwords = stripscript(value);
+      value = this.ruleForm.passwords;
 
       if (value === "") {
         callback(new Error("请再次输入密码"));
@@ -140,38 +142,42 @@ export default {
       }
     };
 
-    const rules = reactive({
-      username: [{ validator: validateUsername, trigger: "blur" }],
-      password: [{ validator: validatePassword, trigger: "blur" }],
-      passwords: [{ validator: validatePasswords, trigger: "blur" }],
-      code: [{ validator: checkCode, trigger: "blur" }]
-    });
-
-    const toggleMenu = item => {
-      menuTab.forEach(item => {
+    return {
+      menuTab: [
+        { txt: "登录", current: true, type: "login" },
+        { txt: "注册", current: false, type: "register" }
+      ],
+      // 模块值
+      model: "login",
+      // 表单的数据
+      ruleForm: {
+        username: "",
+        password: "",
+        passwords: "",
+        code: ""
+      },
+      rules: {
+        username: [{ validator: validateUsername, trigger: "blur" }],
+        password: [{ validator: validatePassword, trigger: "blur" }],
+        passwords: [{ validator: validatePasswords, trigger: "blur" }],
+        code: [{ validator: checkCode, trigger: "blur" }]
+      }
+    };
+  },
+  created() {},
+  mounted() {},
+  methods: {
+    toggleMenu(item) {
+      this.menuTab.forEach(item => {
         item.current = false;
       });
       // 高光
       item.current = true;
       // 修改模块值
-      model.value = item.type;
-    };
-
-    /**
-     * 获取验证码
-     */
-
-    const getSms = () => {
-      GetSms();
-    };
-
-    /**
-     * 提交表单
-     */
-    const submitForm = formName => {
-      GetSms2();
-      return;
-      content.refs[formName].validate(valid => {
+      this.model = item.type;
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
@@ -179,11 +185,7 @@ export default {
           return false;
         }
       });
-    };
-
-    onMounted(() => {});
-
-    return { menuTab, model, toggleMenu, submitForm, ruleForm, rules, getSms };
+    }
   }
 };
 </script>
