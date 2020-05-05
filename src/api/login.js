@@ -2,19 +2,11 @@ import service from "@/utils/request.js";
 /**
  * 获取验证码
  */
-export function GetSms() {
-    service.request({
+export function GetSms(data) {
+    return service.request({
         method: "post",
-        url: "/api/getSms",
-        data: {}
-    })
-}
-
-export function GetSms2() {
-    service.request({
-        method: "post",
-        url: "/devApi/getSms",
-        data: {}
+        url: "/getSms/",
+        data
     })
 }
 
@@ -25,7 +17,21 @@ export function GetSms2() {
 /**
  * 登陆
  */
+export function Login(data) {
+    return service.request({
+        method: "post",
+        url: "/login/",
+        data
+    })
+}
 
 /**
  * 注册
  */
+export function Register(data) {
+    return service.request({
+        method: "post",
+        url: "/register/",
+        data
+    })
+}

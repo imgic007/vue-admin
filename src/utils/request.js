@@ -1,18 +1,18 @@
 import axios from 'axios';
+import { Message } from 'element-ui';
 
 // 创建axios，赋给变量service
 // 手把手撸码前端AP，地址 http://web-jshtml.cn/productApi
 const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi';
 const service = axios.create({
-    // baseURL: BASEURL,
-    baseURL: "",
+    baseURL: BASEURL,
+    // baseURL: "",
     timeout: 30000,
 });
 
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
-    console.log('发送请求', config)
     return config;
 }, function (error) {
     // 对请求错误做些什么
@@ -22,6 +22,15 @@ service.interceptors.request.use(function (config) {
 // 添加响应拦截器
 service.interceptors.response.use(function (response) {
     // 对响应数据做点什么
+    let data = response.data;
+
+    if (data.resCode !== 0) {
+        Message.error(data.message);
+        return Promise.reject(data)
+    } else {
+        return response;
+    }
+
     return response;
 }, function (error) {
     // 对响应错误做点什么
